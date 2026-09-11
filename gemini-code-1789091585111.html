@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Medicamentos - Recordatorio Fácil</title>
+    <style>
+        :root {
+            --azul-principal: #005A9C;
+            --verde-exito: #2E7D32;
+            --naranja-alerta: #D84315;
+            --blanco: #FFFFFF;
+            --fondo-gris: #F0F4F8;
+            --texto-oscuro: #1A1A1A;
+            --borde-tarjeta: #B0BEC5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: var(--fondo-gris);
+            color: var(--texto-oscuro);
+            padding-bottom: 30px;
+        }
+
+        /* Encabezado accesible */
+        header {
+            background-color: var(--azul-principal);
+            color: var(--blanco);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #E0F2FE;
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tarjetas de contenido */
+        .card {
+            background: var(--blanco);
+            border-radius: 12px;
+            border: 2px solid var(--borde-tarjeta);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            color: var(--azul-principal);
+            margin-bottom: 15px;
+            border-bottom: 3px solid var(--fondo-gris);
+            padding-bottom: 8px;
+        }
+
+        /* Formularios adaptados (Textos y campos grandes) */
+        label {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 15px;
+            color: var(--texto-oscuro);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            margin-top: 8px;
+            border: 2px solid #78909C;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            background-color: #FAFAFA;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--azul-principal);
+            outline: none;
+            background-color: #FFF;
+        }
+
+        /* Botón de acción principal grandes */
+        .btn {
+            width: 100%;
+            background-color: var(--verde-exito);
+            color: white;
+            border: none;
+            padding: 18px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Lista de medicamentos */
+        .med-item {
+            background: #FFFFFF;
+            border-left: 8px solid var(--azul-principal);
+            border-top: 1px solid #E0E0E0;
+            border-right: 1px solid #E0E0E0;
+            border-bottom: 1px solid #E0E0E0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .med-info h3 {
+            font-size: 1.3rem;
+            color: var(--azul-principal);
+        }
+
+        .med-info p {
+            font-size: 1.1rem;
+            margin-top: 4px;
+            color: #424242;
+        }
+
+        .hora-badge {
+            background-color: #E3F2FD;
+            color: var(--azul-principal);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .btn-borrar {
+            background-color: #FFEBEE;
+            color: var(--naranja-alerta);
+            border: 2px solid var(--naranja-alerta);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Ventana emergente para la alarma */
+        .modal-alerta {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-contenido {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            border: 5px solid var(--naranja-alerta);
+        }
+
+        .modal-contenido h2 {
+            font-size: 2rem;
+            color: var(--naranja-alerta);
+            margin-bottom: 15px;
+        }
+
+        .modal-contenido p {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .btn-entendido {
+            background-color: var(--verde-exito);
+            color: white;
+            padding: 18px;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>💊 Mi Pastillero</h1>
+        <p>Organizador de Medicamentos</p>
+    </header>
+
+    <div class="container">
+
+        <!-- Formulario para agregar -->
+        <div class="card">
+            <h2>➕ Registrar Nuevo Medicamento</h2>
+            <form id="formMedicamento">
+                <label for="nombre">¿Cómo se llama la medicina?</label>
+                <input type="text" id="nombre" placeholder="Ej: Paracetamol" required>
+
+                <label for="dosis">¿Cuánto debe tomar? (Dosis)</label>
+                <input type="text" id="dosis" placeholder="Ej: 1 pastilla / 5 ml" required>
+
+                <label for="hora">¿A qué hora debe tomarla?</label>
+                <input type="time" id="hora" required>
+
+                <label for="notas">Indicación especial (Opcional):</label>
+                <input type="text" id="notas" placeholder="Ej: Tomar después de almorzar">
+
+                <button type="submit" class="btn"> Guardar Medicamento</button>
+            </form>
+        </div>
+
+        <!-- Lista de recordatorios del día -->
+        <div class="card">
+            <h2>📋 Medicamentos Programados</h2>
+            <div id="listaMedicamentos">
+                <!-- Se llena automáticamente con JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal de Alarma Diaria -->
+    <div id="modalAlerta" class="modal-alerta">
+        <div class="modal-contenido">
+            <h2>🔔 ¡HORA DE TU MEDICINA!</h2>
+            <p id="alertaNombre"><strong>Medicamento</strong></p>
+            <p id="alertaDosis">Dosis</p>
+            <p id="alertaNotas" style="font-size: 1.1rem; color: #555;"></p>
+            <button class="btn-entendido" onclick="cerrarAlerta()">✓ Ya me la tomé</button>
+        </div>
+    </div>
+
+    <script>
+        let medicamentos = JSON.parse(localStorage.getItem('mis_medicamentos')) || [];
+        let sonidoAlarma = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+        sonidoAlarma.loop = true;
+
+        const form = document.getElementById('formMedicamento');
+        const listaContainer = document.getElementById('listaMedicamentos');
+
+        // Mostrar lista guardada
+        function renderizarLista() {
+            listaContainer.innerHTML = '';
+
+            if (medicamentos.length === 0) {
+                listaContainer.innerHTML = '<p style="font-size: 1.2rem; color: #666; text-align: center;">No hay medicamentos registrados.</p>';
+                return;
+            }
+
+            // Ordenar por hora
+            medicamentos.sort((a, b) => a.hora.localeCompare(b.hora));
+
+            medicamentos.forEach((med, index) => {
+                const item = document.createElement('div');
+                item.className = 'med-item';
+                item.innerHTML = `
+                    <div class="med-info">
+                        <h3>💊 ${med.nombre}</h3>
+                        <p><strong>Dosis:</strong> ${med.dosis}</p>
+                        ${med.notas ? `<p>ℹ️ <em>${med.notas}</em></p>` : ''}
+                        <span class="hora-badge">⏰ ${med.hora} hrs</span>
+                    </div>
+                    <button class="btn-borrar" onclick="eliminarMedicamento(${index})">Borrar</button>
+                `;
+                listaContainer.appendChild(item);
+            });
+        }
+
+        // Guardar nuevo medicamento
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const nuevoMed = {
+                nombre: document.getElementById('nombre').value,
+                dosis: document.getElementById('dosis').value,
+                hora: document.getElementById('hora').value,
+                notas: document.getElementById('notas').value,
+                ultimaAlerta: "" // Para controlar que no suene varias veces el mismo minuto
+            };
+
+            medicamentos.push(nuevoMed);
+            localStorage.setItem('mis_medicamentos', JSON.stringify(medicamentos));
+            
+            form.reset();
+            renderizarLista();
+            alert('¡Medicamento guardado con éxito!');
+        });
+
+        // Eliminar medicamento
+        function eliminarMedicamento(index) {
+            if (confirm('¿Desea eliminar este medicamento del registro?')) {
+                medicamentos.splice(index, 1);
+                localStorage.setItem('mis_medicamentos', JSON.stringify(medicamentos));
+                renderizarLista();
+            }
+        }
+
+        // Sistema de comprobación de alarmas
+        setInterval(() => {
+            const ahora = new Date();
+            const horaActual = String(ahora.getHours()).padStart(2, '0') + ':' + String(ahora.getMinutes()).padStart(2, '0');
+            const fechaHoy = ahora.toDateString();
+
+            medicamentos.forEach((med) => {
+                if (med.hora === horaActual && med.ultimaAlerta !== fechaHoy) {
+                    med.ultimaAlerta = fechaHoy;
+                    localStorage.setItem('mis_medicamentos', JSON.stringify(medicamentos));
+                    dispararAlerta(med);
+                }
+            });
+        }, 5000); // Revisa cada 5 segundos
+
+        // Mostrar pantalla de alarma y reproducir sonido
+        function dispararAlerta(med) {
+            document.getElementById('alertaNombre').innerText = med.nombre;
+            document.getElementById('alertaDosis').innerText = 'Dosis: ' + med.dosis;
+            document.getElementById('alertaNotas').innerText = med.notas ? 'Notas: ' + med.notas : '';
+            
+            document.getElementById('modalAlerta').style.display = 'flex';
+            
+            // Intentar reproducir sonido
+            sonidoAlarma.play().catch(() => {
+                console.log("El navegador bloqueó el sonido hasta interacción previa del usuario.");
+            });
+        }
+
+        // Cerrar pantalla de alarma
+        function cerrarAlerta() {
+            sonidoAlarma.pause();
+            sonidoAlarma.currentTime = 0;
+            document.getElementById('modalAlerta').style.display = 'none';
+        }
+
+        // Carga inicial
+        renderizarLista();
+    </script>
+</body>
+</html>
